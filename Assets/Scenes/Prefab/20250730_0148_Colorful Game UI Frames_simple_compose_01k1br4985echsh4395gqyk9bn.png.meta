@@ -1,0 +1,670 @@
+fileFormatVersion: 2
+guid: 84aa11b09e9c40644b5140f3ba01a463
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 320
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_0
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 1008
+        width: 360
+        height: 482
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8351a30cd6f18e4e84b4071caba76fb
+      internalID: -999407671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_1
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 1038
+        width: 282
+        height: 449
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 850bfe5bbe6660148ba2e06ffe0a18ee
+      internalID: -768425620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_2
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 1290
+        width: 264
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 246fee7f75cca0f4bbdd8415c7f0fd9b
+      internalID: -1876680682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_3
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 1080
+        width: 282
+        height: 204
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c0eb832845686245b6962fb2fa2864d
+      internalID: 1293314070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_4
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 882
+        width: 306
+        height: 132
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8babb7d792e51147828e243080507b7
+      internalID: 321017886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_6
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 888
+        width: 264
+        height: 174
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e14a5b7332f87cf4f8dba26f0cb7e2a2
+      internalID: 224182358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_7
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 648
+        width: 332
+        height: 356
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6ce995e26e050aa4c89341a6e00f384b
+      internalID: -84878726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_10
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 762
+        width: 312
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab1fd41b5f71bd046ba13815a4d8fc33
+      internalID: -145233469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_11
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 576
+        width: 212
+        height: 150
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94bd974ba59d2264782125204ba6b284
+      internalID: -958447648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_12
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 408
+        width: 318
+        height: 223
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29b5bbfa97c24f04cb58e7ec7c670cd5
+      internalID: 1843312392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_13
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 582
+        width: 146
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cbc2e4cebf8453428c8841ff2bdbf51
+      internalID: 1520797574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_14
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 582
+        width: 147
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa948f0a592307242bc18f931150a046
+      internalID: 236922932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_15
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 414
+        width: 153
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b388adc3069fc4c47881752cbe68c337
+      internalID: -1020800657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_16
+      rect:
+        serializedVersion: 2
+        x: 568
+        y: 415
+        width: 146
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c200cf7bfdc808458544596e4824075
+      internalID: -692686422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_17
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 413
+        width: 213
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a23e8abb721596e46a8fc87ec477b719
+      internalID: -1593887497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_18
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 240
+        width: 264
+        height: 148
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 501130aa7a8ba0c4dbfa59179fc99034
+      internalID: 1964185614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_19
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 244
+        width: 240
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94724306371319d45acbed63a16e02e5
+      internalID: -124821067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_20
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 248
+        width: 166
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d267c15546152cb4a9449c5a57204d74
+      internalID: 385962818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_21
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 246
+        width: 177
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d68d89a70893c742bd3a9656ef0a2ef
+      internalID: 1098385798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_22
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 72
+        width: 270
+        height: 156
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bfe04eb6848fad49ac78bfc7207d7ff
+      internalID: -539684220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_23
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 72
+        width: 240
+        height: 156
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 263c3bca250c979409a32db433440cba
+      internalID: -1123307253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_24
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 83
+        width: 158
+        height: 145
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 307c12adf8b277d4dbc918ec0cb1dd3f
+      internalID: 393471345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_25
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 86
+        width: 176
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbafc46ec3905bf4f84049c6f3c609f6
+      internalID: -1010213847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_5
+      rect:
+        serializedVersion: 2
+        x: 717
+        y: 736
+        width: 272
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3be8b1b52ae630347ba6e0ac067b40db
+      internalID: -1001397330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 39f87af2b5cd17142acde34ddc3f3ff8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_0: -999407671
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_1: -768425620
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_10: -145233469
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_11: -958447648
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_12: 1843312392
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_13: 1520797574
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_14: 236922932
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_15: -1020800657
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_16: -692686422
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_17: -1593887497
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_18: 1964185614
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_19: -124821067
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_2: -1876680682
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_20: 385962818
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_21: 1098385798
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_22: -539684220
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_23: -1123307253
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_24: 393471345
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_25: -1010213847
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_3: 1293314070
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_4: 321017886
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_5: -1001397330
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_6: 224182358
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_7: -84878726
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_8: -713328396
+      20250730_0148_Colorful Game UI Frames_simple_compose_01k1br4985echsh4395gqyk9bn_9: -2134060733
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

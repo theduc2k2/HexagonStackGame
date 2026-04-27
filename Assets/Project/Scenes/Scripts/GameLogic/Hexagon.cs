@@ -10,8 +10,37 @@ public class Hexagon : MonoBehaviour
 
     public Color color
     {
-        get => renderer.material.color;
-        set => renderer.material.color = value;
+        get
+        {
+            EnsureReferences();
+            return renderer != null ? renderer.material.color : Color.white;
+        }
+        set
+        {
+            EnsureReferences();
+            if (renderer == null)
+                return;
+            renderer.material.color = value;
+        }
+    }
+
+    private void Awake()
+    {
+        EnsureReferences();
+    }
+
+    private void OnValidate()
+    {
+        EnsureReferences();
+    }
+
+    private void EnsureReferences()
+    {
+        if (renderer == null)
+            renderer = GetComponentInChildren<Renderer>(true);
+
+        if (collider == null)
+            collider = GetComponentInChildren<Collider>(true);
     }
 
     public void Configure(HexStack hexStack)
@@ -24,7 +53,12 @@ public class Hexagon : MonoBehaviour
         transform.SetParent(parent);
     }
 
-    public void DisableCollider() => collider.enabled = false;
+    public void DisableCollider()
+    {
+        EnsureReferences();
+        if (collider != null)
+            collider.enabled = false;
+    }
 
     public void Vanish(float delay)
     {
@@ -35,12 +69,9 @@ public class Hexagon : MonoBehaviour
             .setOnComplete(() => Destroy(gameObject));
     }
 
-    public void MoveToLocal(Vector3 targetLocalPos, System.Action onComplete = null)
+    public void MoveToLocal(Vector3 targetLocalPos, System.Action onComplete = null, float delay = 0f, float duration = 0.34f)
     {
         LeanTween.cancel(gameObject);
-
-        float delay = transform.GetSiblingIndex() * 0.02f;
-        float duration = 0.4f;
         Vector3 startLocalPos = transform.localPosition;
         Quaternion startRotation = transform.localRotation;
 

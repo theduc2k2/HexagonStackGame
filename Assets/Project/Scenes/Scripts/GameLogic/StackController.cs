@@ -14,9 +14,10 @@ public class StackController : MonoBehaviour
     [SerializeField] private float dragSmoothTime = 0.06f;
     [SerializeField] private float snapSearchRadius = 1.75f;
     [SerializeField] private float snapReleaseRadius = 2.2f;
+    [SerializeField] private float snapReleaseRadiusMultiplier = 1.4f;
 
     [Header("Placement Highlight")]
-    [SerializeField] private Color placeableColor = new Color(0.45f, 1f, 0.65f, 1f);
+    [SerializeField] private Color placeableColor = new Color(0f, 0.9f, 1.0f, 1f);
     [SerializeField] private float emissionStrength = 0.8f;
 
     [Header("Rotation Settings")]
@@ -165,10 +166,14 @@ public class StackController : MonoBehaviour
         if (targetCell == null)
             targetCell = FindNearestAvailableCell(currentHexStack.transform.position, snapReleaseRadius);
 
+        if (targetCell == null && TryGetPointerWorldPosition(out Vector3 pointerWorldPos))
+            targetCell = FindNearestAvailableCell(pointerWorldPos, snapReleaseRadius * snapReleaseRadiusMultiplier);
+
         if (targetCell == null)
         {
             currentHexStack.transform.position = currentHexStackPos;
             currentHexStack = null;
+            dragVelocity = Vector3.zero;
             return;
         }
 
@@ -258,20 +263,20 @@ public class StackController : MonoBehaviour
         Renderer[] renderers = cell.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < renderers.Length; i++)
         {
-            Renderer renderer = renderers[i];
+            Renderer rend = renderers[i];
             var block = new MaterialPropertyBlock();
 
             if (isHighlighted)
             {
-                renderer.GetPropertyBlock(block);
+                rend.GetPropertyBlock(block);
                 block.SetColor("_Color", placeableColor);
                 block.SetColor("_BaseColor", placeableColor);
                 block.SetColor("_EmissionColor", placeableColor * emissionStrength);
-                renderer.SetPropertyBlock(block);
+                rend.SetPropertyBlock(block);
             }
             else
             {
-                renderer.SetPropertyBlock(block);
+                rend.SetPropertyBlock(block);
             }
         }
     }

@@ -7,6 +7,10 @@ public class MergeManager : MonoBehaviour
     [Header("Elements")]
     private readonly List<GridCell> updatedCells = new List<GridCell>();
 
+    [Header("Merge Animation")]
+    [SerializeField] private float mergeLaunchInterval = 0.075f;
+    [SerializeField] private float mergeFlipDuration = 0.34f;
+
     private Coroutine mergeCoroutine;
 
     public static bool IsMerging { get; private set; }
@@ -147,7 +151,8 @@ public class MergeManager : MonoBehaviour
             Vector3 targetPosition = Vector3.up * targetY;
 
             gridCell.Stack.Add(hexagon);
-            hexagon.MoveToLocal(targetPosition, () => completed++);
+            float launchDelay = i * mergeLaunchInterval;
+            hexagon.MoveToLocal(targetPosition, () => completed++, launchDelay, mergeFlipDuration);
         }
 
         while (completed < hexagonsToAdd.Count)

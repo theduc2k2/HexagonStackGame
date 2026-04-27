@@ -14,6 +14,7 @@ public class StackSpawner : MonoBehaviour
     [SerializeField] private Color[] colors;
     [MinMaxSlider(2, 8)]
     [SerializeField] private Vector2Int minMaxHexCount;
+    [SerializeField] private float slotOccupiedRadius = 0.25f;
 
     private int stackCounter;
     private IColorPairProvider colorPairProvider;
@@ -32,6 +33,7 @@ public class StackSpawner : MonoBehaviour
 
     private void Start()
     {
+        ValidateSpawnPoints();
         GenerateStacks();
     }
 
@@ -53,15 +55,68 @@ public class StackSpawner : MonoBehaviour
             return;
         }
 
+        if (stackPositionParent.childCount <= 0)
+        {
+            Debug.LogWarning("stackPositionParent has no child spawn points.");
+            return;
+        }
+
         for (int i = 0; i < stackPositionParent.childCount; i++)
-            GenerateStack(stackPositionParent.GetChild(i));
+        {
+            Transform slot = stackPositionParent.GetChild(i);
+            if (HasActiveStackInSlot(slot) || IsSlotOccupiedByWorldPosition(slot))
+                continue;
+
+            GenerateStack(slot);
+        }
+    }
+
+    private static bool HasActiveStackInSlot(Transform slot)
+    {
+        if (slot == null)
+            return false;
+
+        for (int i = 0; i < slot.childCount; i++)
+        {
+            Transform child = slot.GetChild(i);
+            if (child != null && child.GetComponent<HexStack>() != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool IsSlotOccupiedByWorldPosition(Transform slot)
+    {
+        if (slot == null)
+            return false;
+
+        HexStack[] allStacks = FindObjectsOfType<HexStack>(true);
+        float sqrRadius = slotOccupiedRadius * slotOccupiedRadius;
+        Vector3 slotPos = slot.position;
+
+        for (int i = 0; i < allStacks.Length; i++)
+        {
+            HexStack stack = allStacks[i];
+            if (stack == null || !stack.gameObject.activeInHierarchy)
+                continue;
+
+            float sqrDist = (stack.transform.position - slotPos).sqrMagnitude;
+            if (sqrDist <= sqrRadius)
+                return true;
+        }
+
+        return false;
     }
 
     private void GenerateStack(Transform parent)
     {
         if (hexagonPrefab == null || hexagonStackPrefab == null)
         {
-            Debug.LogError("Hexagon prefab or HexStack prefab is not assigned.");
+            Debug.LogError(
+                $"StackSpawner missing prefab reference. hexagonPrefab={(hexagonPrefab == null ? "NULL" : hexagonPrefab.name)}, " +
+                $"hexagonStackPrefab={(hexagonStackPrefab == null ? "NULL" : hexagonStackPrefab.name)}",
+                this);
             return;
         }
 
@@ -69,9 +124,14 @@ public class StackSpawner : MonoBehaviour
         if (colorPair == null || colorPair.Length < 2)
             return;
 
-        int minHexCount = Mathf.Min(minMaxHexCount.x, minMaxHexCount.y);
-        int maxHexCount = Mathf.Max(minMaxHexCount.x, minMaxHexCount.y);
+        int minHexCount = Mathf.Clamp(Mathf.Min(minMaxHexCount.x, minMaxHexCount.y), 1, 50);
+        int maxHexCount = Mathf.Clamp(Mathf.Max(minMaxHexCount.x, minMaxHexCount.y), minHexCount, 50);
         int amount = Random.Range(minHexCount, maxHexCount + 1);
+        if (amount <= 0)
+        {
+            Debug.LogWarning("Hex amount resolved to 0. Check minMaxHexCount.");
+            return;
+        }
         int firstColorHexagonCount = Random.Range(0, amount);
 
         HexStack hexStack = Instantiate(hexagonStackPrefab, parent.position, Quaternion.identity, parent);
@@ -104,5 +164,27 @@ public class StackSpawner : MonoBehaviour
         }
 
         return new[] { firstColor, secondColor };
+    }
+
+    private void ValidateSpawnPoints()
+    {
+        if (stackPositionParent == null)
+            return;
+
+        float minSqrDistance = 0.01f;
+        for (int i = 0; i < stackPositionParent.childCount; i++)
+        {
+            Vector3 a = stackPositionParent.GetChild(i).position;
+            for (int j = i + 1; j < stackPositionParent.childCount; j++)
+            {
+                Vector3 b = stackPositionParent.GetChild(j).position;
+                if ((a - b).sqrMagnitude <= minSqrDistance)
+                {
+                    Debug.LogWarning(
+                        $"Spawn points {i} and {j} are too close. This can cause visual overlap.",
+                        stackPositionParent);
+                }
+            }
+        }
     }
 }

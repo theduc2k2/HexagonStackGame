@@ -1,0 +1,7 @@
+{
+  "name": "Project.Application",
+  "rootNamespace": "Project.Application",
+  "references": [
+    "Project.Core"
+  ]
+}

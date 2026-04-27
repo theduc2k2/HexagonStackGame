@@ -1,0 +1,9 @@
+{
+  "name": "Project.ECS",
+  "rootNamespace": "Project.ECS",
+  "references": [
+    "Project.Core",
+    "Project.Application",
+    "Project.Infrastructure"
+  ]
+}

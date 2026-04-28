@@ -95,7 +95,7 @@ public class StackSpawner : MonoBehaviour
         for (int i = 0; i < amount; i++)
         {
             Vector3 worldPos = parent.position + Vector3.up * i * 0.2f;
-            Hexagon hexagonInstance = Instantiate(hexagonPrefab, worldPos, hexagonPrefab.transform.rotation, hexStack.transform);
+            Hexagon hexagonInstance = HexagonPool.Instance.GetHexagon(worldPos, hexagonPrefab.transform.rotation, hexStack.transform);
 
             hexagonInstance.color = i < firstColorHexagonCount ? colorPair[0] : colorPair[1];
             hexagonInstance.Configure(hexStack);

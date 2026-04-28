@@ -8,20 +8,30 @@ public class Hexagon : MonoBehaviour
 
     public HexStack HexStack { get; private set; }
 
+    private static MaterialPropertyBlock _propBlock;
+    private static readonly int _baseColorID = Shader.PropertyToID("_Color");
+    private Color _currentColor;
+
     public Color color
     {
-        get
-        {
-            EnsureReferences();
-            return renderer != null ? renderer.material.color : Color.white;
-        }
+        get => _currentColor;
         set
         {
-            EnsureReferences();
-            if (renderer == null)
-                return;
-            renderer.material.color = value;
+            _currentColor = value;
+            ApplyColor(value);
         }
+    }
+
+    private void ApplyColor(Color color)
+    {
+        EnsureReferences();
+        if (renderer == null) return;
+
+        if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
+        
+        renderer.GetPropertyBlock(_propBlock);
+        _propBlock.SetColor(_baseColorID, color);
+        renderer.SetPropertyBlock(_propBlock);
     }
 
     private void Awake()
@@ -53,6 +63,13 @@ public class Hexagon : MonoBehaviour
         transform.SetParent(parent);
     }
 
+    public void PrepareForReuse()
+    {
+        EnsureReferences();
+        if (collider != null)
+            collider.enabled = true;
+    }
+
     public void DisableCollider()
     {
         EnsureReferences();
@@ -66,7 +83,7 @@ public class Hexagon : MonoBehaviour
         LeanTween.scale(gameObject, Vector3.zero, 0.2f)
             .setEase(LeanTweenType.easeInBack)
             .setDelay(delay)
-            .setOnComplete(() => Destroy(gameObject));
+            .setOnComplete(() => HexagonPool.Instance.ReturnHexagon(this));
     }
 
     public void VanishToScore(float delay, Vector3 scoreWorldPos)
@@ -85,7 +102,7 @@ public class Hexagon : MonoBehaviour
                 // Fly to the score UI position
                 LeanTween.move(gameObject, scoreWorldPos, 0.5f)
                     .setEase(LeanTweenType.easeInCubic)
-                    .setOnComplete(() => Destroy(gameObject));
+                    .setOnComplete(() => HexagonPool.Instance.ReturnHexagon(this));
 
                 LeanTween.scale(gameObject, Vector3.one * 0.4f, 0.5f);
                 LeanTween.rotateAround(gameObject, Vector3.up, 360f, 0.5f);

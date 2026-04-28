@@ -181,10 +181,12 @@ public class MergeManager : MonoBehaviour
         ScoreManager.Instance?.AddPoints(similarHexagonCount * 10);
 
         float delay = 0f;
+        Vector3 scorePos = ScoreManager.Instance != null ? ScoreManager.Instance.GetScoreWorldPosition() : Vector3.up * 10f;
+
         while (similarHexagons.Count > 0)
         {
             similarHexagons[0].SetParent(null);
-            similarHexagons[0].Vanish(delay);
+            similarHexagons[0].VanishToScore(delay, scorePos);
             delay += 0.05f;
 
             gridCell.Stack.Remove(similarHexagons[0]);

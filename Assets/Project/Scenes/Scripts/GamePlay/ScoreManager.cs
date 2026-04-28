@@ -9,9 +9,13 @@ public class ScoreManager : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private Text unityScoreText; // Thêm hỗ trợ Text thường của Unity
     [SerializeField] private Slider scoreProgressBar;
+    [SerializeField] private Transform scoreIconTarget; // Ô icon hoặc vị trí cụ thể để hex bay tới
 
     public int CurrentScore { get; private set; } = 0;
+    private float displayedScore = 0;
+    [SerializeField] private float countSpeed = 100f;
 
     [System.Serializable]
     public class LevelScorePair
@@ -45,6 +49,15 @@ public class ScoreManager : MonoBehaviour
 #endif
     }
 
+    private void Update()
+    {
+        if (displayedScore < CurrentScore)
+        {
+            displayedScore = Mathf.MoveTowards(displayedScore, CurrentScore, Time.deltaTime * countSpeed);
+            UpdateScoreText();
+        }
+    }
+
     private void Start()
     {
         InitLevel();
@@ -53,6 +66,7 @@ public class ScoreManager : MonoBehaviour
     public void InitLevel()
     {
         CurrentScore = 0;
+        displayedScore = 0;
 
         int currentLevelIndex = LevelController.Instance != null ? LevelController.Instance.currentLevel : 0;
         SetTargetScore(currentLevelIndex);
@@ -63,7 +77,39 @@ public class ScoreManager : MonoBehaviour
     {
         CurrentScore += amount;
 
-        UpdateUI();
+        if (scoreProgressBar != null)
+        {
+            scoreProgressBar.maxValue = currentTargetScore;
+            scoreProgressBar.value = CurrentScore;
+        }
+
+        UpdateScoreText();
+
+        if (scoreText != null)
+        {
+            LeanTween.cancel(scoreText.gameObject);
+            scoreText.transform.localScale = Vector3.one;
+            LeanTween.scale(scoreText.gameObject, Vector3.one * 1.2f, 0.15f)
+                .setEase(LeanTweenType.easeOutQuad)
+                .setOnComplete(() =>
+                {
+                    LeanTween.scale(scoreText.gameObject, Vector3.one, 0.15f)
+                        .setEase(LeanTweenType.easeInQuad);
+                });
+        }
+
+        if (unityScoreText != null)
+        {
+            LeanTween.cancel(unityScoreText.gameObject);
+            unityScoreText.transform.localScale = Vector3.one;
+            LeanTween.scale(unityScoreText.gameObject, Vector3.one * 1.2f, 0.15f)
+                .setEase(LeanTweenType.easeOutQuad)
+                .setOnComplete(() =>
+                {
+                    LeanTween.scale(unityScoreText.gameObject, Vector3.one, 0.15f)
+                        .setEase(LeanTweenType.easeInQuad);
+                });
+        }
 
         if (CurrentScore >= currentTargetScore)
         {
@@ -78,14 +124,36 @@ public class ScoreManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        if (scoreText != null)
-            scoreText.text = $"{CurrentScore} / {currentTargetScore}";
+        UpdateScoreText();
 
         if (scoreProgressBar != null)
         {
             scoreProgressBar.maxValue = currentTargetScore;
             scoreProgressBar.value = CurrentScore;
         }
+    }
+
+    private void UpdateScoreText()
+    {
+        string textValue = $"{(int)displayedScore} / {currentTargetScore}";
+
+        if (scoreText != null)
+            scoreText.text = textValue;
+        
+        if (unityScoreText != null)
+            unityScoreText.text = textValue;
+    }
+
+    public Vector3 GetScoreWorldPosition()
+    {
+        // Ưu tiên dùng scoreIconTarget nếu được gán trong Inspector
+        if (scoreIconTarget != null) return scoreIconTarget.position;
+        
+        // Nếu không thì dùng vị trí của text điểm số (TMP hoặc Legacy Text)
+        if (scoreText != null) return scoreText.transform.position;
+        if (unityScoreText != null) return unityScoreText.transform.position;
+        
+        return Vector3.up * 10f;
     }
 
     private void SetTargetScore(int levelIndex)

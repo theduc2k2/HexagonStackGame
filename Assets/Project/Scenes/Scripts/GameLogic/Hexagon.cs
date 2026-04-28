@@ -69,6 +69,29 @@ public class Hexagon : MonoBehaviour
             .setOnComplete(() => Destroy(gameObject));
     }
 
+    public void VanishToScore(float delay, Vector3 scoreWorldPos)
+    {
+        LeanTween.cancel(gameObject);
+        DisableCollider();
+
+        // High arc towards the score
+        Vector3 peakPos = transform.position + Vector3.up * 2f;
+        
+        LeanTween.move(gameObject, peakPos, 0.3f)
+            .setEase(LeanTweenType.easeOutQuad)
+            .setDelay(delay)
+            .setOnComplete(() =>
+            {
+                // Fly to the score UI position
+                LeanTween.move(gameObject, scoreWorldPos, 0.5f)
+                    .setEase(LeanTweenType.easeInCubic)
+                    .setOnComplete(() => Destroy(gameObject));
+
+                LeanTween.scale(gameObject, Vector3.one * 0.4f, 0.5f);
+                LeanTween.rotateAround(gameObject, Vector3.up, 360f, 0.5f);
+            });
+    }
+
         public void MoveToLocal(Vector3 targetLocalPos, System.Action onComplete = null, float delay = 0f, float duration = 0.34f)
     {
         LeanTween.cancel(gameObject);

@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject levelCompletePanel;
     [SerializeField] private Animator panelAnimator;
     [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private Text unityLevelText; // Thêm hỗ trợ Text thường của Unity
     [SerializeField] private Button nextButton;
 
     [Header("UI References - Game Over")]
@@ -48,14 +49,16 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("⚠️ levelCompletePanel chưa được gán trong Inspector!");
         }
 
-        if (levelText != null)
+        if (levelText != null || unityLevelText != null)
         {
-            levelText.gameObject.SetActive(true);
+            if (levelText != null) levelText.gameObject.SetActive(true);
+            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
+            
             SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
         }
         else
         {
-            Debug.LogWarning("⚠️ levelText chưa được gán trong Inspector!");
+            Debug.LogWarning("⚠️ levelText hoặc unityLevelText chưa được gán trong Inspector!");
         }
 
         if (nextButton != null)
@@ -134,6 +137,11 @@ public class LevelManager : MonoBehaviour
             levelText.gameObject.SetActive(false);
         }
 
+        if (unityLevelText != null)
+        {
+            unityLevelText.gameObject.SetActive(false);
+        }
+
         if (nextButton != null)
         {
             nextButton.gameObject.SetActive(true);
@@ -172,9 +180,10 @@ public class LevelManager : MonoBehaviour
             LevelController.Instance.OnNextLevelButtonClicked();
         }
 
-        if (levelText != null)
+        if (levelText != null || unityLevelText != null)
         {
-            levelText.gameObject.SetActive(true);
+            if (levelText != null) levelText.gameObject.SetActive(true);
+            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
             SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
         }
     }
@@ -203,9 +212,10 @@ public class LevelManager : MonoBehaviour
             levelCompletePanel.SetActive(false);
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
-        if (levelText != null)
+        if (levelText != null || unityLevelText != null)
         {
-            levelText.gameObject.SetActive(true);
+            if (levelText != null) levelText.gameObject.SetActive(true);
+            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
             SyncLevel(0);
         }
 
@@ -231,10 +241,18 @@ public class LevelManager : MonoBehaviour
 
     private void UpdateLevelText(int level)
     {
+        string levelStr = "Level: " + (level + 1);
+        
         if (levelText != null)
         {
-            levelText.text = "Level: " + (level + 1);
+            levelText.text = levelStr;
             Debug.Log($"✅ LevelManager: Cập nhật levelText: {levelText.text}");
+        }
+
+        if (unityLevelText != null)
+        {
+            unityLevelText.text = levelStr;
+            Debug.Log($"✅ LevelManager: Cập nhật unityLevelText: {unityLevelText.text}");
         }
     }
 }

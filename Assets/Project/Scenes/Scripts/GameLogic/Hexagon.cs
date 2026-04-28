@@ -69,38 +69,51 @@ public class Hexagon : MonoBehaviour
             .setOnComplete(() => Destroy(gameObject));
     }
 
-    public void MoveToLocal(Vector3 targetLocalPos, System.Action onComplete = null, float delay = 0f, float duration = 0.34f)
+        public void MoveToLocal(Vector3 targetLocalPos, System.Action onComplete = null, float delay = 0f, float duration = 0.34f)
     {
         LeanTween.cancel(gameObject);
+        
         Vector3 startLocalPos = transform.localPosition;
         Quaternion startRotation = transform.localRotation;
 
+        // Tính toán hướng di chuyển để xác định trục lật (flip axis)
         Vector3 moveDir = (targetLocalPos - startLocalPos);
         moveDir.y = 0f;
+        
         Vector3 flipAxis = moveDir.sqrMagnitude > 0.0001f
             ? Vector3.Cross(moveDir.normalized, Vector3.up).normalized
             : Vector3.right;
 
-        Quaternion flipRotation = Quaternion.AngleAxis(180f, flipAxis) * startRotation;
+        // Lật 180 độ quanh trục vừa tính
+        Quaternion flipRotation = Quaternion.AngleAxis(360f, flipAxis) * startRotation;
 
-        float distance = Vector3.Distance(startLocalPos, targetLocalPos);
-        float jumpHeight = Mathf.Clamp(0.18f + distance * 0.3f, 0.18f, 0.55f);
+        // Tính khoảng cách để điều chỉnh độ cao bước nhảy (jump height) hài hòa
+        float flatDist = Vector3.Distance(new Vector3(startLocalPos.x, 0, startLocalPos.z), new Vector3(targetLocalPos.x, 0, targetLocalPos.z));
+        float jumpHeight = Mathf.Clamp(0.2f + flatDist * 0.25f, 0.2f, 0.6f);
 
         LeanTween.value(gameObject, 0f, 1f, duration)
-            .setEase(LeanTweenType.easeOutCubic)
+            .setEase(LeanTweenType.easeOutQuad) // Tạo cảm giác hạ cánh êm hơn
             .setDelay(delay)
             .setOnUpdate((float t) =>
             {
-                Vector3 flat = Vector3.Lerp(startLocalPos, targetLocalPos, t);
-                float arc = Mathf.Sin(t * Mathf.PI) * jumpHeight;
-                transform.localPosition = flat + Vector3.up * arc;
+                // Di chuyển tịnh tiến phẳng
+                Vector3 flatPos = Vector3.Lerp(startLocalPos, targetLocalPos, t);
+                
+                // Hiệu ứng nhảy (Arc) - dùng t * (1-t) để tạo đường cong mượt nhất
+                float arc = 4f * jumpHeight * t * (1f - t);
+                
+                transform.localPosition = new Vector3(flatPos.x, flatPos.y + arc, flatPos.z);
+                
+                // Xoay lật mượt mà
                 transform.localRotation = Quaternion.Slerp(startRotation, flipRotation, t);
             })
             .setOnComplete(() =>
             {
+                // Đảm bảo vị trí cuối cùng chính xác tuyệt đối
                 transform.localPosition = targetLocalPos;
-                transform.localRotation = startRotation;
+                // Giữ nguyên rotation lật 180 độ (vì hexagon đối xứng nên nó vẫn đẹp và không bị giật)
                 onComplete?.Invoke();
             });
     }
+
 }

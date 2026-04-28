@@ -71,6 +71,47 @@ public class StackSpawner : MonoBehaviour
         }
     }
 
+    private void GenerateStack(Transform parent)
+    {
+        if (hexagonPrefab == null || hexagonStackPrefab == null)
+        {
+            Debug.LogError($"StackSpawner missing prefab reference.");
+            return;
+        }
+
+        Color[] colorPair = GetRandomColors();
+        if (colorPair == null || colorPair.Length < 2) return;
+
+        int minHexCount = Mathf.Clamp(Mathf.Min(minMaxHexCount.x, minMaxHexCount.y), 1, 50);
+        int maxHexCount = Mathf.Clamp(Mathf.Max(minMaxHexCount.x, minMaxHexCount.y), minHexCount, 50);
+        int amount = Random.Range(minHexCount, maxHexCount + 1);
+        int firstColorHexagonCount = Random.Range(0, amount);
+
+        // 1. Khởi tạo Stack
+        HexStack hexStack = Instantiate(hexagonStackPrefab, parent.position, Quaternion.identity, parent);
+        hexStack.name = $"Stack{parent.GetSiblingIndex()}";
+
+        // 2. Tạo các Hexagon bên trong Stack TRƯỚC KHI co nhỏ Stack
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 worldPos = parent.position + Vector3.up * i * 0.2f;
+            Hexagon hexagonInstance = Instantiate(hexagonPrefab, worldPos, hexagonPrefab.transform.rotation, hexStack.transform);
+
+            hexagonInstance.color = i < firstColorHexagonCount ? colorPair[0] : colorPair[1];
+            hexagonInstance.Configure(hexStack);
+            hexStack.Add(hexagonInstance);
+        }
+
+        // 3. SAU KHI ĐÃ CÓ CON, bây giờ mới co nhỏ và làm hiệu ứng Pop-up
+        hexStack.transform.localScale = Vector3.zero; 
+        float spawnDelay = parent.GetSiblingIndex() * 0.1f;
+        
+        LeanTween.scale(hexStack.gameObject, Vector3.one, 0.45f)
+            .setEase(LeanTweenType.easeOutBack)
+            .setDelay(spawnDelay);
+    }
+
+
     private static bool HasActiveStackInSlot(Transform slot)
     {
         if (slot == null)
@@ -109,45 +150,7 @@ public class StackSpawner : MonoBehaviour
         return false;
     }
 
-    private void GenerateStack(Transform parent)
-    {
-        if (hexagonPrefab == null || hexagonStackPrefab == null)
-        {
-            Debug.LogError(
-                $"StackSpawner missing prefab reference. hexagonPrefab={(hexagonPrefab == null ? "NULL" : hexagonPrefab.name)}, " +
-                $"hexagonStackPrefab={(hexagonStackPrefab == null ? "NULL" : hexagonStackPrefab.name)}",
-                this);
-            return;
-        }
 
-        Color[] colorPair = GetRandomColors();
-        if (colorPair == null || colorPair.Length < 2)
-            return;
-
-        int minHexCount = Mathf.Clamp(Mathf.Min(minMaxHexCount.x, minMaxHexCount.y), 1, 50);
-        int maxHexCount = Mathf.Clamp(Mathf.Max(minMaxHexCount.x, minMaxHexCount.y), minHexCount, 50);
-        int amount = Random.Range(minHexCount, maxHexCount + 1);
-        if (amount <= 0)
-        {
-            Debug.LogWarning("Hex amount resolved to 0. Check minMaxHexCount.");
-            return;
-        }
-        int firstColorHexagonCount = Random.Range(0, amount);
-
-        HexStack hexStack = Instantiate(hexagonStackPrefab, parent.position, Quaternion.identity, parent);
-        hexStack.name = $"Stack{parent.GetSiblingIndex()}";
-
-        for (int i = 0; i < amount; i++)
-        {
-            Vector3 localPos = Vector3.up * i * 0.2f;
-            Vector3 worldPos = hexStack.transform.TransformPoint(localPos);
-            Hexagon hexagonInstance = Instantiate(hexagonPrefab, worldPos, hexagonPrefab.transform.rotation, hexStack.transform);
-
-            hexagonInstance.color = i < firstColorHexagonCount ? colorPair[0] : colorPair[1];
-            hexagonInstance.Configure(hexStack);
-            hexStack.Add(hexagonInstance);
-        }
-    }
 
     private Color[] GetRandomColors()
     {
@@ -186,5 +189,12 @@ public class StackSpawner : MonoBehaviour
                 }
             }
         }
+    }
+
+    public bool IsSpawnSlot(Transform t)
+    {
+        if (stackPositionParent == null || t == null)
+            return false;
+        return t.IsChildOf(stackPositionParent);
     }
 }

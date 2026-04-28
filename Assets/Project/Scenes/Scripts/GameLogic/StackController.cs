@@ -82,14 +82,16 @@ public class StackController : MonoBehaviour
                 lastMousePosition = Input.mousePosition;
             }
         }
-        else if (Input.GetMouseButton(0))
+
+        if (Input.GetMouseButton(0))
         {
             if (currentHexStack != null)
                 ManageMouseDrag();
             else if (isRotating)
                 RotateMapSmooth();
         }
-        else if (Input.GetMouseButtonUp(0))
+
+        if (Input.GetMouseButtonUp(0))
         {
             if (currentHexStack != null)
                 ManageMouseUp();
@@ -159,7 +161,7 @@ public class StackController : MonoBehaviour
         SetHighlightedCell(targetCell);
     }
 
-    private void ManageMouseUp()
+        private void ManageMouseUp()
     {
         SetHighlightedCell(null);
 
@@ -171,7 +173,7 @@ public class StackController : MonoBehaviour
 
         if (targetCell == null)
         {
-            currentHexStack.transform.position = currentHexStackPos;
+            LeanTween.move(currentHexStack.gameObject, currentHexStackPos, 0.25f).setEase(LeanTweenType.easeOutBack);
             currentHexStack = null;
             dragVelocity = Vector3.zero;
             return;
@@ -180,17 +182,29 @@ public class StackController : MonoBehaviour
         Vector3 targetPosition = targetCell.transform.position;
         targetPosition.y = 0.2f;
 
-        currentHexStack.transform.position = targetPosition;
-        currentHexStack.transform.SetParent(targetCell.transform);
-        currentHexStack.Place();
-        targetCell.AssignHexStack(currentHexStack);
+        // Lưu lại tham chiếu để dùng trong OnComplete của LeanTween
+        HexStack stackToPlace = currentHexStack;
+        GridCell cellToAssign = targetCell;
 
-        onStackPlaced?.Invoke(targetCell);
+        // Logic placement thực hiện ngay để khóa ô (Occupied) tránh lỗi logic
+        stackToPlace.Place();
+        cellToAssign.AssignHexStack(stackToPlace);
+        stackToPlace.transform.SetParent(cellToAssign.transform);
+
+        // Hiệu ứng "đặt xuống nhẹ nhàng"
+        LeanTween.move(stackToPlace.gameObject, targetPosition, 0.15f)
+            .setEase(LeanTweenType.easeOutQuad) // Chạm đất êm ái
+            .setOnComplete(() =>
+            {
+                // CHỈ KHI NÀO hạ cánh xong mới kích hoạt hiệu ứng Merge
+                onStackPlaced?.Invoke(cellToAssign);
+            });
 
         targetCell = null;
         currentHexStack = null;
         dragVelocity = Vector3.zero;
     }
+
 
     private bool TryGetPointerWorldPosition(out Vector3 worldPos)
     {
@@ -216,10 +230,17 @@ public class StackController : MonoBehaviour
     {
         cachedGridCells.Clear();
         GridCell[] cells = FindObjectsOfType<GridCell>();
+        StackSpawner spawner = FindObjectOfType<StackSpawner>();
+
         for (int i = 0; i < cells.Length; i++)
         {
             if (cells[i] != null && cells[i].gameObject.activeInHierarchy)
+            {
+                if (spawner != null && spawner.IsSpawnSlot(cells[i].transform))
+                    continue;
+
                 cachedGridCells.Add(cells[i]);
+            }
         }
     }
 

@@ -78,8 +78,9 @@ public class MergeManager : MonoBehaviour
         LayerMask gridCellMask = 1 << gridCell.gameObject.layer;
         List<GridCell> neighborGridCells = new List<GridCell>();
 
-        // Thay số 2f cứng nhắc bằng biến mergeSearchRadius
-        Collider[] neighborGridCellColliders = Physics.OverlapSphere(gridCell.transform.position, mergeSearchRadius, gridCellMask);
+        // Tự động scale bán kính tìm kiếm theo tỉ lệ thu nhỏ của Map để tránh hút nhầm ô vòng ngoài
+        float currentSearchRadius = mergeSearchRadius * gridCell.transform.lossyScale.x;
+        Collider[] neighborGridCellColliders = Physics.OverlapSphere(gridCell.transform.position, currentSearchRadius, gridCellMask);
         foreach (Collider gridCellCollider in neighborGridCellColliders)
         {
             GridCell neighborGridCell = gridCellCollider.GetComponent<GridCell>();

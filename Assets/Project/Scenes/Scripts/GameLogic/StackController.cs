@@ -189,9 +189,10 @@ public class StackController : MonoBehaviour
         // Logic placement thực hiện ngay để khóa ô (Occupied) tránh lỗi logic
         stackToPlace.Place();
         cellToAssign.AssignHexStack(stackToPlace);
-        stackToPlace.transform.SetParent(cellToAssign.transform);
+        stackToPlace.transform.SetParent(cellToAssign.transform, true); // Giữ nguyên kích thước to ban đầu để làm animation
 
-        // Hiệu ứng "đặt xuống nhẹ nhàng"
+        // Hiệu ứng "đặt xuống nhẹ nhàng" và tự động thu nhỏ lại cho vừa với ô lưới
+        LeanTween.scale(stackToPlace.gameObject, Vector3.one, 0.15f).setEase(LeanTweenType.easeOutQuad);
         LeanTween.move(stackToPlace.gameObject, targetPosition, 0.15f)
             .setEase(LeanTweenType.easeOutQuad) // Chạm đất êm ái
             .setOnComplete(() =>

@@ -9,9 +9,15 @@ public class LevelController : MonoBehaviour
 {
     public static LevelController Instance;
 
-    [Header("Level Data Generation")]
+    [Header("Level Data")]
     public LevelData[] levelDatas;
-    public GridCell gridCellPrefab;
+    [SerializeField] private GridCell gridCellPrefab;
+
+    [Header("Auto Scale Settings")]
+    [SerializeField] private float maxMapWidth = 15f; // Chiều rộng tối đa an toàn trên màn hình dọc
+    [SerializeField] private float maxMapHeight = 15f; // Chiều cao tối đa an toàn trên màn hình dọc
+    
+    [Header("Pooling")]
     public Transform gridParent;
 
     private List<GridCell> activeGridCells = new List<GridCell>();
@@ -135,24 +141,19 @@ public class LevelController : MonoBehaviour
         }
 
         if (levelIndex < 0 || levelIndex >= levelDatas.Length)
-        {
-            Debug.LogError($"⚠️ Level index {levelIndex + 1} ngoài phạm vi mảng levelDatas!");
-            return;
-        }
-
-        currentLevel = levelIndex;
-        Debug.Log($"Activating Level Data {levelIndex + 1}");
-
-        // Thu hồi grid cũ về pool
-        ClearCurrentGrid();
-
-        // Load Grid mới từ Data
-        LevelData data = levelDatas[currentLevel];
         if (gridCellPrefab == null)
         {
-            Debug.LogError("⚠️ gridCellPrefab chưa được gán trong LevelController! Vui lòng kéo một Prefab GridCell (ví dụ Hexagon lưới) vào.");
+            Debug.LogError("⚠️ gridCellPrefab chưa được gán trong LevelController! Hãy kéo prefab GridCell vào đây.");
             return;
         }
+
+        ClearCurrentGrid();
+
+        LevelData data = levelDatas[levelIndex];
+        Debug.Log($"Activating Level Data {levelIndex + 1} with {data.cells.Count} cells");
+
+        Vector3 minBounds = new Vector3(float.MaxValue, 0, float.MaxValue);
+        Vector3 maxBounds = new Vector3(float.MinValue, 0, float.MinValue);
 
         foreach (CellData cellData in data.cells)
         {
@@ -161,7 +162,37 @@ public class LevelController : MonoBehaviour
             cell.transform.localPosition = cellData.localPosition;
             cell.gameObject.SetActive(true);
             activeGridCells.Add(cell);
+
+            // Tìm giới hạn của map để căn giữa
+            if (cellData.localPosition.x < minBounds.x) minBounds.x = cellData.localPosition.x;
+            if (cellData.localPosition.z < minBounds.z) minBounds.z = cellData.localPosition.z;
+            if (cellData.localPosition.x > maxBounds.x) maxBounds.x = cellData.localPosition.x;
+            if (cellData.localPosition.z > maxBounds.z) maxBounds.z = cellData.localPosition.z;
         }
+
+        // Tự động scale và căn giữa map
+        if (data.cells.Count > 0)
+        {
+            // Tính toán kích thước thật của Map (cộng thêm 1 chút margin do kích thước của 1 ô)
+            float mapWidth = (maxBounds.x - minBounds.x) + 2f; 
+            float mapHeight = (maxBounds.z - minBounds.z) + 2.5f;
+
+            // Tính tỉ lệ thu nhỏ nếu map vượt quá giới hạn màn hình
+            float scaleX = maxMapWidth / mapWidth;
+            float scaleZ = maxMapHeight / mapHeight;
+            float finalScale = Mathf.Min(1f, scaleX, scaleZ); // Chỉ thu nhỏ, không phóng to quá 1
+
+            // Thu nhỏ Parent
+            gridParent.localScale = new Vector3(finalScale, finalScale, finalScale);
+
+            // Căn giữa sau khi đã scale
+            Vector3 centerOffset = (minBounds + maxBounds) / 2f;
+            gridParent.localPosition = -centerOffset * finalScale;
+        }
+
+        ResetLevelState();
+
+        currentLevel = levelIndex;
 
         if (levelText != null)
         {
@@ -171,7 +202,6 @@ public class LevelController : MonoBehaviour
         }
 
         ScoreManager.Instance?.InitLevel();
-        ResetLevelState();
 
         if (LevelManager.Instance != null)
         {

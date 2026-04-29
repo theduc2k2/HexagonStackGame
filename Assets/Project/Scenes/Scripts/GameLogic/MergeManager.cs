@@ -10,6 +10,9 @@ public class MergeManager : MonoBehaviour
     [Header("Merge Animation")]
     [SerializeField] private float mergeLaunchInterval = 0.075f;
     [SerializeField] private float mergeFlipDuration = 0.34f;
+    
+    [Header("Merge Logic")]
+    [SerializeField] private float mergeSearchRadius = 2f; // <--- Thêm biến này để chỉnh khoảng cách tìm hàng xóm
 
     private Coroutine mergeCoroutine;
 
@@ -75,7 +78,8 @@ public class MergeManager : MonoBehaviour
         LayerMask gridCellMask = 1 << gridCell.gameObject.layer;
         List<GridCell> neighborGridCells = new List<GridCell>();
 
-        Collider[] neighborGridCellColliders = Physics.OverlapSphere(gridCell.transform.position, 2f, gridCellMask);
+        // Thay số 2f cứng nhắc bằng biến mergeSearchRadius
+        Collider[] neighborGridCellColliders = Physics.OverlapSphere(gridCell.transform.position, mergeSearchRadius, gridCellMask);
         foreach (Collider gridCellCollider in neighborGridCellColliders)
         {
             GridCell neighborGridCell = gridCellCollider.GetComponent<GridCell>();

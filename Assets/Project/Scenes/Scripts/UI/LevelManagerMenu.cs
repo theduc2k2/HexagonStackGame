@@ -84,7 +84,7 @@ public class LevelManagerMenu : MonoBehaviour
             return;
         }
 
-        if (levelIndex - 1 < 0 || levelIndex - 1 >= LevelController.Instance.levels.Length)
+        if (levelIndex - 1 < 0 || levelIndex - 1 >= LevelController.Instance.levelDatas.Length)
         {
             Debug.LogError($"Level index {levelIndex} is out of range.");
             isLoading = false;

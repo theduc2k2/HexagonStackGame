@@ -2,14 +2,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 public class LevelController : MonoBehaviour
 {
     public static LevelController Instance;
 
-    [Header("Level Configuration")]
-    public GameObject[] levels;
+    [Header("Level Data Generation")]
+    public LevelData[] levelDatas;
+    public GridCell gridCellPrefab;
+    public Transform gridParent;
+
+    private List<GridCell> activeGridCells = new List<GridCell>();
+    private Queue<GridCell> gridCellPool = new Queue<GridCell>();
+
     public int currentLevel = 0;
 
     [Header("UI Elements")]
@@ -29,6 +36,7 @@ public class LevelController : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             Debug.Log("✅ LevelController đã được khởi tạo.");
+            AutoLoadLevelData();
         }
         else
         {
@@ -38,10 +46,33 @@ public class LevelController : MonoBehaviour
         }
     }
 
+    [ContextMenu("Auto Load Levels")]
+    private void AutoLoadLevelData()
+    {
+        LevelData[] loadedLevels = Resources.LoadAll<LevelData>("Levels");
+        if (loadedLevels != null && loadedLevels.Length > 0)
+        {
+            levelDatas = loadedLevels.OrderBy(l => l.levelID).ToArray();
+            Debug.Log($"✅ Đã tự động load {levelDatas.Length} levels từ thư mục Resources/Levels.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Không tìm thấy file LevelData nào trong thư mục Resources/Levels!");
+        }
+    }
+
     private void Start()
     {
         int selectedLevel = PlayerPrefs.GetInt("SelectedLevel", 1) - 1;
-        currentLevel = Mathf.Clamp(selectedLevel, 0, levels.Length - 1);
+        currentLevel = Mathf.Clamp(selectedLevel, 0, (levelDatas != null && levelDatas.Length > 0) ? levelDatas.Length - 1 : 0);
+        
+        // Tạo gridParent nếu chưa gán
+        if (gridParent == null)
+        {
+            GameObject gp = new GameObject("GridParent");
+            gp.transform.SetParent(this.transform);
+            gridParent = gp.transform;
+        }
         ActivateLevel(currentLevel);
         ScoreManager.Instance?.InitLevel();
 
@@ -97,25 +128,39 @@ public class LevelController : MonoBehaviour
 
     public void ActivateLevel(int levelIndex)
     {
-        if (levelIndex < 0 || levelIndex >= levels.Length)
+        if (levelDatas == null || levelDatas.Length == 0)
         {
-            Debug.LogError($"⚠️ Level index {levelIndex + 1} ngoài phạm vi mảng levels!");
+            Debug.LogError("⚠️ Mảng levelDatas chưa được gán data! Hãy kéo thả các file LevelData vào LevelController.");
+            return;
+        }
+
+        if (levelIndex < 0 || levelIndex >= levelDatas.Length)
+        {
+            Debug.LogError($"⚠️ Level index {levelIndex + 1} ngoài phạm vi mảng levelDatas!");
             return;
         }
 
         currentLevel = levelIndex;
-        Debug.Log($"Activating Level {levelIndex + 1}");
-        for (int i = 0; i < levels.Length; i++)
+        Debug.Log($"Activating Level Data {levelIndex + 1}");
+
+        // Thu hồi grid cũ về pool
+        ClearCurrentGrid();
+
+        // Load Grid mới từ Data
+        LevelData data = levelDatas[currentLevel];
+        if (gridCellPrefab == null)
         {
-            if (levels[i] != null)
-            {
-                levels[i].SetActive(i == levelIndex);
-                Debug.Log($"Level {i + 1} set active: {i == levelIndex}");
-            }
-            else
-            {
-                Debug.LogError($"⚠️ Level {i + 1} trong mảng levels chưa được gán!");
-            }
+            Debug.LogError("⚠️ gridCellPrefab chưa được gán trong LevelController! Vui lòng kéo một Prefab GridCell (ví dụ Hexagon lưới) vào.");
+            return;
+        }
+
+        foreach (CellData cellData in data.cells)
+        {
+            GridCell cell = GetGridCellFromPool();
+            cell.transform.SetParent(gridParent);
+            cell.transform.localPosition = cellData.localPosition;
+            cell.gameObject.SetActive(true);
+            activeGridCells.Add(cell);
         }
 
         if (levelText != null)
@@ -135,10 +180,32 @@ public class LevelController : MonoBehaviour
         }
     }
 
+    private GridCell GetGridCellFromPool()
+    {
+        if (gridCellPool.Count > 0)
+        {
+            return gridCellPool.Dequeue();
+        }
+        return Instantiate(gridCellPrefab);
+    }
+
+    private void ClearCurrentGrid()
+    {
+        foreach (GridCell cell in activeGridCells)
+        {
+            if (cell.IsOccupied)
+            {
+                cell.ClearHexStack();
+            }
+            cell.gameObject.SetActive(false);
+            gridCellPool.Enqueue(cell);
+        }
+        activeGridCells.Clear();
+    }
+
     private void ResetLevelState()
     {
-        GridCell[] gridCells = levels[currentLevel].GetComponentsInChildren<GridCell>();
-        foreach (GridCell cell in gridCells)
+        foreach (GridCell cell in activeGridCells)
         {
             if (cell.IsOccupied)
             {
@@ -197,7 +264,7 @@ public class LevelController : MonoBehaviour
         if (levelCompletePanel != null) levelCompletePanel.SetActive(false);
 
         currentLevel++;
-        if (currentLevel < levels.Length)
+        if (currentLevel < levelDatas.Length)
         {
             ActivateLevel(currentLevel);
             int levelToUnlock = currentLevel + 1;
@@ -223,7 +290,7 @@ public class LevelController : MonoBehaviour
         else
         {
             Debug.Log("🎉 Bạn đã hoàn thành tất cả các màn!");
-            currentLevel = levels.Length - 1;
+            currentLevel = levelDatas.Length - 1;
             if (levelText != null)
             {
                 levelText.gameObject.SetActive(true);
@@ -274,13 +341,12 @@ public class LevelController : MonoBehaviour
 
     public void CheckGameOver(bool isMerged)
     {
-        GridCell[] gridCells = levels[currentLevel].GetComponentsInChildren<GridCell>();
-        bool allOccupied = gridCells.All(cell => cell.IsOccupied);
+        bool allOccupied = activeGridCells.All(cell => cell.IsOccupied);
         int currentScore = ScoreManager.Instance?.CurrentScore ?? 0;
         int targetScore = ScoreManager.Instance?.GetTargetScore() ?? 0;
 
         Debug.Log($"🔍 CheckGameOver - AllOccupied: {allOccupied}, IsMerged: {isMerged}, Score: {currentScore}/{targetScore}");
-        Debug.Log($"Total GridCells: {gridCells.Length}, Occupied: {gridCells.Count(cell => cell.IsOccupied)}");
+        Debug.Log($"Total GridCells: {activeGridCells.Count}, Occupied: {activeGridCells.Count(cell => cell.IsOccupied)}");
 
         if (allOccupied && !isMerged && currentScore < targetScore)
         {

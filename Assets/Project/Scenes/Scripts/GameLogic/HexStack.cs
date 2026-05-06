@@ -3,33 +3,40 @@ using UnityEngine;
 
 public class HexStack : MonoBehaviour
 {
-    public List<Hexagon> Hexagons { get; private set; }
+    private readonly List<Hexagon> hexagons = new List<Hexagon>();
+
+    public List<Hexagon> Hexagons => hexagons;
     public GridCell CurrentGridCell { get; set; }
+    public int Count => hexagons.Count;
 
     public void Add(Hexagon hexagon)
     {
-        if (Hexagons == null)
-            Hexagons = new List<Hexagon>();
+        if (hexagon == null || hexagons.Contains(hexagon))
+            return;
 
-        Hexagons.Add(hexagon);
-        hexagon.transform.parent = transform;
+        hexagons.Add(hexagon);
+        hexagon.Configure(this);
+        hexagon.transform.SetParent(transform);
     }
 
-    public Color GetTopHexagonColor() => Hexagons[^1].color;
+    public Color GetTopHexagonColor() => hexagons[^1].color;
 
     public void Place()
     {
-        foreach (Hexagon hexagon in Hexagons)
+        foreach (Hexagon hexagon in hexagons)
             hexagon.DisableCollider();
     }
 
-    public bool Contains(Hexagon hexagon) => Hexagons.Contains(hexagon);
+    public bool Contains(Hexagon hexagon) => hexagons.Contains(hexagon);
 
     public void Remove(Hexagon hexagon)
     {
-        Hexagons.Remove(hexagon);
+        if (hexagon == null || !hexagons.Remove(hexagon))
+            return;
 
-        if (Hexagons.Count > 0)
+        hexagon.Configure(null);
+
+        if (hexagons.Count > 0)
             return;
 
         if (Application.isPlaying)

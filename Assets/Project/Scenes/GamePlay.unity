@@ -1859,7 +1859,7 @@ GameObject:
   - component: {fileID: 827149581}
   - component: {fileID: 827149580}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Victory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2493,7 +2493,7 @@ GameObject:
   - component: {fileID: 1105991061}
   - component: {fileID: 1105991064}
   m_Layer: 5
-  m_Name: Button (Legacy)
+  m_Name: Countinue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2884,7 +2884,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.10653264, g: 0.026210396, b: 0.1792453, a: 0.90588236}
+  m_Color: {r: 0.18039216, g: 0.08883437, b: 0.027450975, a: 0.90588236}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3132,7 +3132,7 @@ GameObject:
   - component: {fileID: 1234067089}
   - component: {fileID: 1234067088}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Claim-x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4429,7 +4429,7 @@ GameObject:
   - component: {fileID: 1847922989}
   - component: {fileID: 1847922988}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: Coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4542,6 +4542,7 @@ MonoBehaviour:
     lockImage: {fileID: 1340295899}
   - levelButton: {fileID: 1112892850}
     lockImage: {fileID: 2006501069}
+  resetUnlocksToFirstLevelOnAwake: 0
 --- !u!4 &1861524217
 Transform:
   m_ObjectHideFlags: 0
@@ -5088,6 +5089,7 @@ MonoBehaviour:
   mergeLaunchInterval: 0.075
   mergeFlipDuration: 0.34
   mergeSearchRadius: 1
+  completeStackThreshold: 10
 --- !u!4 &2092322839
 Transform:
   m_ObjectHideFlags: 0

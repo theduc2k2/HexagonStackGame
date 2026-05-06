@@ -35,13 +35,18 @@ public class StackController : MonoBehaviour
 
     private Vector3 dragVelocity;
     private readonly List<GridCell> cachedGridCells = new List<GridCell>();
-    private GridCell highlightedCell;
+    private GridCellHighlighter cellHighlighter;
 
     public static Action<GridCell> onStackPlaced;
 
+    private void Awake()
+    {
+        cellHighlighter = new GridCellHighlighter(placeableColor, emissionStrength);
+    }
+
     private void OnDisable()
     {
-        SetHighlightedCell(null);
+        cellHighlighter?.Set(null);
     }
 
     private void Update()
@@ -158,12 +163,12 @@ public class StackController : MonoBehaviour
             dragSmoothTime);
 
         targetCell = FindNearestAvailableCell(pointerWorldPos, snapSearchRadius);
-        SetHighlightedCell(targetCell);
+        cellHighlighter.Set(targetCell);
     }
 
         private void ManageMouseUp()
     {
-        SetHighlightedCell(null);
+        cellHighlighter.Set(null);
 
         if (targetCell == null)
             targetCell = FindNearestAvailableCell(currentHexStack.transform.position, snapReleaseRadius);
@@ -230,8 +235,8 @@ public class StackController : MonoBehaviour
     private void RefreshGridCells()
     {
         cachedGridCells.Clear();
-        GridCell[] cells = FindObjectsOfType<GridCell>();
-        StackSpawner spawner = FindObjectOfType<StackSpawner>();
+        GridCell[] cells = FindObjectsByType<GridCell>(FindObjectsSortMode.None);
+        StackSpawner spawner = FindFirstObjectByType<StackSpawner>();
 
         for (int i = 0; i < cells.Length; i++)
         {
@@ -265,42 +270,6 @@ public class StackController : MonoBehaviour
         }
 
         return nearest;
-    }
-
-    private void SetHighlightedCell(GridCell newCell)
-    {
-        if (highlightedCell == newCell)
-            return;
-
-        ApplyHighlight(highlightedCell, false);
-        highlightedCell = newCell;
-        ApplyHighlight(highlightedCell, true);
-    }
-
-    private void ApplyHighlight(GridCell cell, bool isHighlighted)
-    {
-        if (cell == null)
-            return;
-
-        Renderer[] renderers = cell.GetComponentsInChildren<Renderer>();
-        for (int i = 0; i < renderers.Length; i++)
-        {
-            Renderer rend = renderers[i];
-            var block = new MaterialPropertyBlock();
-
-            if (isHighlighted)
-            {
-                rend.GetPropertyBlock(block);
-                block.SetColor("_Color", placeableColor);
-                block.SetColor("_BaseColor", placeableColor);
-                block.SetColor("_EmissionColor", placeableColor * emissionStrength);
-                rend.SetPropertyBlock(block);
-            }
-            else
-            {
-                rend.SetPropertyBlock(block);
-            }
-        }
     }
 
     private Ray GetClickRay() => Camera.main.ScreenPointToRay(Input.mousePosition);

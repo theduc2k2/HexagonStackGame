@@ -6,7 +6,12 @@ namespace Project.Core.Domain.Merge
 
         public MergeRule(int completeThreshold)
         {
-            CompleteThreshold = completeThreshold;
+            CompleteThreshold = completeThreshold < 1 ? 1 : completeThreshold;
+        }
+
+        public bool IsComplete(int matchingTopCount)
+        {
+            return matchingTopCount >= CompleteThreshold;
         }
     }
 }

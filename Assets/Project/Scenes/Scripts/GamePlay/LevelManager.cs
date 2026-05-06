@@ -1,7 +1,7 @@
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Collections;
 
 public class LevelManager : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject levelCompletePanel;
     [SerializeField] private Animator panelAnimator;
     [SerializeField] private TextMeshProUGUI levelText;
-    [SerializeField] private Text unityLevelText; // Thêm hỗ trợ Text thường của Unity
+    [SerializeField] private Text unityLevelText;
     [SerializeField] private Button nextButton;
 
     [Header("UI References - Game Over")]
@@ -19,7 +19,12 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Animator gameOverAnimator;
     [SerializeField] private Button retryButton;
 
-    private bool isWaitingForNext = false;
+    private bool isWaitingForPlayerAction;
+    private LevelTextPresenter levelTextPresenter;
+    private AnimatedPanelPresenter levelCompletePresenter;
+    private AnimatedPanelPresenter gameOverPresenter;
+    private LevelFlowButtonPresenter nextButtonPresenter;
+    private LevelFlowButtonPresenter retryButtonPresenter;
 
     private void Awake()
     {
@@ -27,11 +32,10 @@ public class LevelManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("✅ LevelManager đã được khởi tạo.");
         }
         else
         {
-            Debug.LogWarning("⚠️ Một instance khác của LevelManager đã tồn tại, hủy instance này.");
+            Debug.LogWarning("Another LevelManager instance already exists. Destroying duplicate.");
             Destroy(gameObject);
             return;
         }
@@ -39,220 +43,137 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        if (levelCompletePanel != null)
-        {
-            levelCompletePanel.SetActive(false);
-            panelAnimator = levelCompletePanel.GetComponent<Animator>();
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ levelCompletePanel chưa được gán trong Inspector!");
-        }
-
-        if (levelText != null || unityLevelText != null)
-        {
-            if (levelText != null) levelText.gameObject.SetActive(true);
-            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
-            
-            SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ levelText hoặc unityLevelText chưa được gán trong Inspector!");
-        }
-
-        if (nextButton != null)
-        {
-            nextButton.gameObject.SetActive(false);
-            nextButton.onClick.AddListener(OnNextLevelButtonClicked);
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ nextButton chưa được gán trong Inspector!");
-        }
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-            gameOverAnimator = gameOverPanel.GetComponent<Animator>();
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ gameOverPanel chưa được gán trong Inspector!");
-        }
-
-        if (retryButton != null)
-        {
-            retryButton.gameObject.SetActive(false);
-            retryButton.onClick.AddListener(OnRetryButtonClicked);
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ retryButton chưa được gán trong Inspector!");
-        }
+        CreatePresenters();
+        InitializeViews();
+        BindButtons();
     }
 
     public void SyncLevel(int level)
     {
-        UpdateLevelText(level);
+        levelTextPresenter?.SetLevel(level);
     }
 
     public void CompleteLevel()
     {
-        if (isWaitingForNext || levelCompletePanel == null || panelAnimator == null) return;
-        isWaitingForNext = true;
+        if (isWaitingForPlayerAction || levelCompletePresenter == null || !levelCompletePresenter.IsReady)
+            return;
 
-        levelCompletePanel.SetActive(true);
-        panelAnimator.ResetTrigger("IdleNextLevel");
-        panelAnimator.SetTrigger("NextLevel");
-
+        isWaitingForPlayerAction = true;
+        levelCompletePresenter.ShowAndPlay();
         StartCoroutine(HandleLevelCompleteUI());
     }
 
     public void OnLevelFailed()
     {
-        if (isWaitingForNext || gameOverPanel == null || gameOverAnimator == null) return;
-        isWaitingForNext = true;
+        if (isWaitingForPlayerAction || gameOverPresenter == null || !gameOverPresenter.IsReady)
+            return;
 
-        gameOverPanel.SetActive(true);
-        gameOverAnimator.ResetTrigger("GameOverIdle");
-        gameOverAnimator.SetTrigger("GameOver");
-
+        isWaitingForPlayerAction = true;
+        gameOverPresenter.ShowAndPlay();
         StartCoroutine(HandleLevelFailedUI());
-    }
-
-    private IEnumerator HandleLevelCompleteUI()
-    {
-        float duration = GetAnimationClipLength("NextLevel", panelAnimator);
-        yield return new WaitForSeconds(duration);
-
-        if (panelAnimator != null)
-        {
-            panelAnimator.ResetTrigger("NextLevel");
-            panelAnimator.SetTrigger("IdleNextLevel");
-        }
-
-        if (levelText != null)
-        {
-            levelText.gameObject.SetActive(false);
-        }
-
-        if (unityLevelText != null)
-        {
-            unityLevelText.gameObject.SetActive(false);
-        }
-
-        if (nextButton != null)
-        {
-            nextButton.gameObject.SetActive(true);
-        }
-    }
-
-    private IEnumerator HandleLevelFailedUI()
-    {
-        float duration = GetAnimationClipLength("GameOver", gameOverAnimator);
-        yield return new WaitForSeconds(duration);
-
-        if (gameOverAnimator != null)
-        {
-            gameOverAnimator.ResetTrigger("GameOver");
-            gameOverAnimator.SetTrigger("GameOverIdle");
-        }
-
-        if (retryButton != null)
-        {
-            retryButton.gameObject.SetActive(true);
-            Debug.Log("❌ Hiển thị nút Game Over khi thua cuộc");
-        }
-    }
-
-    private void OnNextLevelButtonClicked()
-    {
-        if (!isWaitingForNext) return;
-
-        isWaitingForNext = false;
-
-        if (nextButton != null) nextButton.gameObject.SetActive(false);
-        if (levelCompletePanel != null) levelCompletePanel.SetActive(false);
-
-        if (LevelController.Instance != null)
-        {
-            LevelController.Instance.OnNextLevelButtonClicked();
-        }
-
-        if (levelText != null || unityLevelText != null)
-        {
-            if (levelText != null) levelText.gameObject.SetActive(true);
-            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
-            SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
-        }
-    }
-
-    private void OnRetryButtonClicked()
-    {
-        if (!isWaitingForNext) return;
-
-        isWaitingForNext = false;
-
-        if (retryButton != null) retryButton.gameObject.SetActive(false);
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-
-        if (LevelController.Instance != null)
-        {
-            LevelController.Instance.ActivateLevel(LevelController.Instance.currentLevel);
-            Debug.Log($"🔄 Quay lại Level {LevelController.Instance.currentLevel + 1}");
-        }
     }
 
     public void RestartFromBeginning()
     {
-        isWaitingForNext = false;
+        isWaitingForPlayerAction = false;
+        levelCompletePresenter?.Hide();
+        gameOverPresenter?.Hide();
+        nextButtonPresenter?.SetVisible(false);
+        retryButtonPresenter?.SetVisible(false);
+        levelTextPresenter?.SetVisible(true);
+        SyncLevel(0);
+        LevelController.Instance?.InitFirstLevel();
+    }
 
-        if (levelCompletePanel != null)
-            levelCompletePanel.SetActive(false);
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);
-        if (levelText != null || unityLevelText != null)
+    private void CreatePresenters()
+    {
+        if (levelCompletePanel != null && panelAnimator == null)
+            panelAnimator = levelCompletePanel.GetComponent<Animator>();
+
+        if (gameOverPanel != null && gameOverAnimator == null)
+            gameOverAnimator = gameOverPanel.GetComponent<Animator>();
+
+        levelTextPresenter = new LevelTextPresenter(levelText, unityLevelText);
+        levelCompletePresenter = new AnimatedPanelPresenter(levelCompletePanel, panelAnimator, "NextLevel", "IdleNextLevel");
+        gameOverPresenter = new AnimatedPanelPresenter(gameOverPanel, gameOverAnimator, "GameOver", "GameOverIdle");
+        nextButtonPresenter = new LevelFlowButtonPresenter(nextButton);
+        retryButtonPresenter = new LevelFlowButtonPresenter(retryButton);
+    }
+
+    private void InitializeViews()
+    {
+        levelCompletePresenter.Hide();
+        gameOverPresenter.Hide();
+        nextButtonPresenter.SetVisible(false);
+        retryButtonPresenter.SetVisible(false);
+
+        if (levelTextPresenter.HasAnyText)
         {
-            if (levelText != null) levelText.gameObject.SetActive(true);
-            if (unityLevelText != null) unityLevelText.gameObject.SetActive(true);
-            SyncLevel(0);
+            levelTextPresenter.SetVisible(true);
+            SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
         }
+        else
+        {
+            Debug.LogWarning("No level text is assigned in LevelManager.");
+        }
+
+        if (!levelCompletePresenter.IsReady)
+            Debug.LogWarning("Level complete panel or animator is not assigned in LevelManager.");
+
+        if (!gameOverPresenter.IsReady)
+            Debug.LogWarning("Game over panel or animator is not assigned in LevelManager.");
+
+        if (!nextButtonPresenter.IsAssigned)
+            Debug.LogWarning("nextButton is not assigned in LevelManager.");
+
+        if (!retryButtonPresenter.IsAssigned)
+            Debug.LogWarning("retryButton is not assigned in LevelManager.");
+    }
+
+    private void BindButtons()
+    {
+        nextButtonPresenter.Bind(OnNextLevelButtonClicked);
+        retryButtonPresenter.Bind(OnRetryButtonClicked);
+    }
+
+    private IEnumerator HandleLevelCompleteUI()
+    {
+        yield return new WaitForSeconds(levelCompletePresenter.GetShowAnimationLength());
+        levelCompletePresenter.SwitchToIdle();
+        levelTextPresenter.SetVisible(false);
+        nextButtonPresenter.SetVisible(true);
+    }
+
+    private IEnumerator HandleLevelFailedUI()
+    {
+        yield return new WaitForSeconds(gameOverPresenter.GetShowAnimationLength());
+        gameOverPresenter.SwitchToIdle();
+        retryButtonPresenter.SetVisible(true);
+    }
+
+    private void OnNextLevelButtonClicked()
+    {
+        if (!isWaitingForPlayerAction)
+            return;
+
+        isWaitingForPlayerAction = false;
+        nextButtonPresenter.SetVisible(false);
+        levelCompletePresenter.Hide();
+        LevelController.Instance?.OnNextLevelButtonClicked();
+        levelTextPresenter.SetVisible(true);
+        SyncLevel(LevelController.Instance != null ? LevelController.Instance.currentLevel : 0);
+    }
+
+    private void OnRetryButtonClicked()
+    {
+        if (!isWaitingForPlayerAction)
+            return;
+
+        isWaitingForPlayerAction = false;
+        retryButtonPresenter.SetVisible(false);
+        gameOverPresenter.Hide();
 
         if (LevelController.Instance != null)
-        {
-            LevelController.Instance.InitFirstLevel();
-        }
-    }
-
-    private float GetAnimationClipLength(string clipName, Animator animator)
-    {
-        if (animator == null || animator.runtimeAnimatorController == null)
-            return 1f;
-
-        foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
-        {
-            if (clip != null && clip.name == clipName)
-                return clip.length;
-        }
-
-        return 1f;
-    }
-
-    private void UpdateLevelText(int level)
-    {
-        string levelStr = "Level: " + (level + 1);
-        
-        if (levelText != null)
-        {
-            levelText.text = levelStr;
-            Debug.Log($"✅ LevelManager: Cập nhật levelText: {levelText.text}");
-        }
-
-        if (unityLevelText != null)
-        {
-            unityLevelText.text = levelStr;
-            Debug.Log($"✅ LevelManager: Cập nhật unityLevelText: {unityLevelText.text}");
-        }
+            LevelController.Instance.ActivateLevel(LevelController.Instance.currentLevel);
     }
 }

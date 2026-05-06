@@ -1,25 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using Project.Core.Domain.Merge;
 using UnityEngine;
 
 public class MergeManager : MonoBehaviour
 {
-    [Header("Elements")]
     private readonly List<GridCell> updatedCells = new List<GridCell>();
 
     [Header("Merge Animation")]
     [SerializeField] private float mergeLaunchInterval = 0.075f;
     [SerializeField] private float mergeFlipDuration = 0.34f;
-    
+
     [Header("Merge Logic")]
-    [SerializeField] private float mergeSearchRadius = 2f; // <--- Thêm biến này để chỉnh khoảng cách tìm hàng xóm
+    [SerializeField] private float mergeSearchRadius = 2f;
+    [SerializeField] private int completeStackThreshold = 10;
 
     private Coroutine mergeCoroutine;
+    private GridCellNeighborFinder neighborFinder;
+    private MergeCandidateSelector candidateSelector;
+    private MergeRule mergeRule;
 
     public static bool IsMerging { get; private set; }
 
     private void Awake()
     {
+        neighborFinder = new GridCellNeighborFinder(mergeSearchRadius);
+        candidateSelector = new MergeCandidateSelector();
+        mergeRule = new MergeRule(completeStackThreshold);
         StackController.onStackPlaced += StackPlacedCallback;
     }
 
@@ -57,82 +64,30 @@ public class MergeManager : MonoBehaviour
         if (!gridCell.IsOccupied)
             yield break;
 
-        List<GridCell> neighborGridCells = GetNeighborGridCells(gridCell);
-        if (neighborGridCells.Count <= 0)
+        List<GridCell> neighborGridCells = neighborFinder.FindOccupiedNeighbors(gridCell);
+        if (neighborGridCells.Count == 0)
             yield break;
 
-        Color gridCellTopHexagonColor = gridCell.Stack.GetTopHexagonColor();
-        List<GridCell> similarNeighborGridCells = GetSimilarNeighborGridCells(gridCellTopHexagonColor, neighborGridCells.ToArray());
-        updatedCells.AddRange(similarNeighborGridCells);
+        Color topColor = gridCell.Stack.GetTopHexagonColor();
+        List<GridCell> similarNeighbors = candidateSelector.FindSimilarTopColorNeighbors(topColor, neighborGridCells);
+        if (similarNeighbors.Count == 0)
+            yield break;
 
-        List<Hexagon> hexagonsToAdd = GetHexagonToAdd(gridCellTopHexagonColor, similarNeighborGridCells.ToArray());
-        RemoveHexagonsFromStacks(hexagonsToAdd, similarNeighborGridCells.ToArray());
+        updatedCells.AddRange(similarNeighbors);
+
+        List<Hexagon> hexagonsToAdd = candidateSelector.FindTopMatchingHexagons(topColor, similarNeighbors);
+        RemoveHexagonsFromStacks(hexagonsToAdd, similarNeighbors);
         yield return StartCoroutine(MoveHexagons(gridCell, hexagonsToAdd));
 
         yield return new WaitForSeconds(0.2f);
-        yield return CheckForCompleteStack(gridCell, gridCellTopHexagonColor);
+        yield return CheckForCompleteStack(gridCell, topColor);
     }
 
-    private List<GridCell> GetNeighborGridCells(GridCell gridCell)
+    private static void RemoveHexagonsFromStacks(List<Hexagon> hexagonsToAdd, List<GridCell> sourceCells)
     {
-        LayerMask gridCellMask = 1 << gridCell.gameObject.layer;
-        List<GridCell> neighborGridCells = new List<GridCell>();
-
-        // Tự động scale bán kính tìm kiếm theo tỉ lệ thu nhỏ của Map để tránh hút nhầm ô vòng ngoài
-        float currentSearchRadius = mergeSearchRadius * gridCell.transform.lossyScale.x;
-        Collider[] neighborGridCellColliders = Physics.OverlapSphere(gridCell.transform.position, currentSearchRadius, gridCellMask);
-        foreach (Collider gridCellCollider in neighborGridCellColliders)
+        foreach (GridCell sourceCell in sourceCells)
         {
-            GridCell neighborGridCell = gridCellCollider.GetComponent<GridCell>();
-            if (neighborGridCell == null || !neighborGridCell.IsOccupied || neighborGridCell == gridCell)
-                continue;
-
-            neighborGridCells.Add(neighborGridCell);
-        }
-
-        return neighborGridCells;
-    }
-
-    private List<GridCell> GetSimilarNeighborGridCells(Color gridCellTopHexagonColor, GridCell[] neighborGridCells)
-    {
-        List<GridCell> similarNeighborGridCells = new List<GridCell>();
-
-        foreach (GridCell neighborGridCell in neighborGridCells)
-        {
-            Color neighborGridCellTopHexagonColor = neighborGridCell.Stack.GetTopHexagonColor();
-            if (gridCellTopHexagonColor == neighborGridCellTopHexagonColor)
-                similarNeighborGridCells.Add(neighborGridCell);
-        }
-
-        return similarNeighborGridCells;
-    }
-
-    private List<Hexagon> GetHexagonToAdd(Color gridCellTopHexagonColor, GridCell[] neighborGridCells)
-    {
-        List<Hexagon> hexagonsToAdd = new List<Hexagon>();
-
-        foreach (GridCell neighborCell in neighborGridCells)
-        {
-            HexStack neighborHexStack = neighborCell.Stack;
-            for (int i = neighborHexStack.Hexagons.Count - 1; i >= 0; i--)
-            {
-                Hexagon hexagon = neighborHexStack.Hexagons[i];
-                if (hexagon.color != gridCellTopHexagonColor)
-                    break;
-
-                hexagonsToAdd.Add(hexagon);
-                hexagon.SetParent(null);
-            }
-        }
-
-        return hexagonsToAdd;
-    }
-
-    private void RemoveHexagonsFromStacks(List<Hexagon> hexagonsToAdd, GridCell[] similarNeighborGridCells)
-    {
-        foreach (GridCell neighborCell in similarNeighborGridCells)
-        {
-            HexStack stack = neighborCell.Stack;
+            HexStack stack = sourceCell.Stack;
             foreach (Hexagon hexagon in hexagonsToAdd)
             {
                 if (stack.Contains(hexagon))
@@ -166,21 +121,12 @@ public class MergeManager : MonoBehaviour
 
     private IEnumerator CheckForCompleteStack(GridCell gridCell, Color topColor)
     {
-        if (gridCell.Stack.Hexagons.Count < 10)
+        if (gridCell.Stack.Count < mergeRule.CompleteThreshold)
             yield break;
 
-        List<Hexagon> similarHexagons = new List<Hexagon>(0);
-        for (int i = gridCell.Stack.Hexagons.Count - 1; i >= 0; i--)
-        {
-            Hexagon hexagon = gridCell.Stack.Hexagons[i];
-            if (hexagon.color != topColor)
-                break;
-
-            similarHexagons.Add(hexagon);
-        }
-
+        List<Hexagon> similarHexagons = GetTopColorRun(gridCell.Stack, topColor);
         int similarHexagonCount = similarHexagons.Count;
-        if (similarHexagons.Count < 10)
+        if (!mergeRule.IsComplete(similarHexagonCount))
             yield break;
 
         ScoreManager.Instance?.AddPoints(similarHexagonCount * 10);
@@ -190,15 +136,31 @@ public class MergeManager : MonoBehaviour
 
         while (similarHexagons.Count > 0)
         {
-            similarHexagons[0].SetParent(null);
-            similarHexagons[0].VanishToScore(delay, scorePos);
+            Hexagon hexagon = similarHexagons[0];
+            hexagon.SetParent(null);
+            hexagon.VanishToScore(delay, scorePos);
             delay += 0.05f;
 
-            gridCell.Stack.Remove(similarHexagons[0]);
+            gridCell.Stack.Remove(hexagon);
             similarHexagons.RemoveAt(0);
         }
 
         updatedCells.Add(gridCell);
         yield return new WaitForSeconds(0.2f + (similarHexagonCount + 1) * 0.01f);
+    }
+
+    private static List<Hexagon> GetTopColorRun(HexStack stack, Color topColor)
+    {
+        List<Hexagon> similarHexagons = new List<Hexagon>();
+        for (int i = stack.Hexagons.Count - 1; i >= 0; i--)
+        {
+            Hexagon hexagon = stack.Hexagons[i];
+            if (hexagon.color != topColor)
+                break;
+
+            similarHexagons.Add(hexagon);
+        }
+
+        return similarHexagons;
     }
 }

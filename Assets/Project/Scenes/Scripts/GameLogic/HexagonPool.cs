@@ -11,7 +11,7 @@ public class HexagonPool : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private int initialHexagonCount = 60;
 
-    private Queue<Hexagon> hexagonPool = new Queue<Hexagon>();
+    private readonly Queue<Hexagon> hexagonPool = new Queue<Hexagon>();
     private Transform poolContainer;
 
     private void Awake()
@@ -37,6 +37,12 @@ public class HexagonPool : MonoBehaviour
 
     private void AddHexagonToPool()
     {
+        if (hexagonPrefab == null)
+        {
+            Debug.LogError("hexagonPrefab is not assigned in HexagonPool.");
+            return;
+        }
+
         Hexagon hex = Instantiate(hexagonPrefab, poolContainer);
         hex.gameObject.SetActive(false);
         hexagonPool.Enqueue(hex);
@@ -44,7 +50,11 @@ public class HexagonPool : MonoBehaviour
 
     public Hexagon GetHexagon(Vector3 position, Quaternion rotation, Transform parent)
     {
-        if (hexagonPool.Count == 0) AddHexagonToPool();
+        if (hexagonPool.Count == 0)
+            AddHexagonToPool();
+
+        if (hexagonPool.Count == 0)
+            return null;
 
         Hexagon hex = hexagonPool.Dequeue();
         hex.transform.SetParent(parent);
@@ -61,6 +71,7 @@ public class HexagonPool : MonoBehaviour
         if (hex == null) return;
         
         LeanTween.cancel(hex.gameObject);
+        hex.Configure(null);
         hex.gameObject.SetActive(false);
         hex.transform.SetParent(poolContainer);
         hexagonPool.Enqueue(hex);

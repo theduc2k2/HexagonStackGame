@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7379969807523624233}
-  - component: {fileID: -5934855880921100274}
+  - component: {fileID: 1686697467384868802}
   m_Layer: 9
   m_Name: Ground
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 2917388804624710002}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-5934855880921100274
+--- !u!114 &1686697467384868802
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11df3cf34ee82cf45ac7d914e26fe4db, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridCell
 --- !u!1001 &2611338572549446684
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -99,6 +99,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2237097420746664964, guid: 3523ae8de9348a042a89f96716528177, type: 3}
+    - {fileID: 4463503661532815913, guid: 3523ae8de9348a042a89f96716528177, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

@@ -11,7 +11,7 @@ public class LevelController : MonoBehaviour
 
     [Header("Level Data")]
     public LevelData[] levelDatas;
-    [SerializeField] private GridCell gridCellPrefab;
+    public GridCell gridCellPrefab; // Đổi thành public để Editor có thể lấy prefab
 
     [Header("Auto Scale Settings")]
     [SerializeField] private float maxMapWidth = 15f; // Chiều rộng tối đa an toàn trên màn hình dọc
@@ -141,6 +141,11 @@ public class LevelController : MonoBehaviour
         }
 
         if (levelIndex < 0 || levelIndex >= levelDatas.Length)
+        {
+            Debug.LogError($"⚠️ Level index {levelIndex} out of bounds!");
+            return;
+        }
+
         if (gridCellPrefab == null)
         {
             Debug.LogError("⚠️ gridCellPrefab chưa được gán trong LevelController! Hãy kéo prefab GridCell vào đây.");

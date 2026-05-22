@@ -130,6 +130,7 @@ public class MergeManager : MonoBehaviour
             yield break;
 
         ScoreManager.Instance?.AddPoints(similarHexagonCount * 10);
+        ScoreManager.Instance?.PlayScoreFillFxSequence(similarHexagonCount, 0.05f, 0.8f);
 
         float delay = 0f;
         Vector3 scorePos = ScoreManager.Instance != null ? ScoreManager.Instance.GetScoreWorldPosition() : Vector3.up * 10f;

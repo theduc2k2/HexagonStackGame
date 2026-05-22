@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 using System.Linq;
 using Project.Application.UseCases;
 using Project.Infrastructure.Persistence;
@@ -24,13 +23,10 @@ public class LevelController : MonoBehaviour
     public int currentLevel = 0;
 
     [Header("UI Elements")]
-    public Button nextButton;
-    [SerializeField] private GameObject levelCompletePanel;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private GameObject canvasGameplay;
     [SerializeField] private GameObject canvasMenuGame;
 
-    private Animator panelAnimator;
     private bool isWaitingForNext;
 
     private ILevelDataProvider levelDataProvider;
@@ -76,26 +72,6 @@ public class LevelController : MonoBehaviour
         CreateGridBuilder();
         ActivateLevel(currentLevel);
         ScoreManager.Instance?.InitLevel();
-
-        if (nextButton != null)
-        {
-            nextButton.onClick.AddListener(OnNextLevelButtonClicked);
-            nextButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            Debug.LogWarning("NextButton is not assigned in LevelController.");
-        }
-
-        if (levelCompletePanel != null)
-        {
-            levelCompletePanel.SetActive(false);
-            panelAnimator = levelCompletePanel.GetComponent<Animator>();
-        }
-        else
-        {
-            Debug.LogWarning("LevelCompletePanel is not assigned in LevelController.");
-        }
 
         if (levelText != null)
         {
@@ -161,37 +137,19 @@ public class LevelController : MonoBehaviour
 
     public void OnLevelCompleted()
     {
-        if (levelCompletePanel == null || panelAnimator == null)
+        if (isWaitingForNext)
+            return;
+
+        if (LevelManager.Instance == null)
         {
-            Debug.LogWarning("LevelCompletePanel or Animator is not assigned.");
+            Debug.LogError("LevelManager.Instance is not initialized. Win UI flow is owned by LevelManager.");
             return;
         }
 
+        if (!LevelManager.Instance.TryCompleteLevel())
+            return;
+
         isWaitingForNext = true;
-        levelCompletePanel.SetActive(true);
-        panelAnimator.ResetTrigger("IdleNextLevel");
-        panelAnimator.SetTrigger("NextLevel");
-
-        StartCoroutine(HandleLevelCompleteUI());
-    }
-
-    private IEnumerator HandleLevelCompleteUI()
-    {
-        float duration = GetAnimationClipLength("NextLevel");
-        yield return new WaitForSeconds(duration);
-
-        if (panelAnimator != null)
-        {
-            panelAnimator.ResetTrigger("NextLevel");
-            panelAnimator.SetTrigger("IdleNextLevel");
-        }
-
-        if (nextButton != null)
-        {
-            nextButton.gameObject.SetActive(true);
-            if (levelText != null)
-                levelText.gameObject.SetActive(false);
-        }
     }
 
     public void OnNextLevelButtonClicked()
@@ -200,9 +158,6 @@ public class LevelController : MonoBehaviour
             return;
 
         isWaitingForNext = false;
-
-        if (nextButton != null) nextButton.gameObject.SetActive(false);
-        if (levelCompletePanel != null) levelCompletePanel.SetActive(false);
 
         currentLevel++;
         if (currentLevel < levelDatas.Length)
@@ -300,20 +255,6 @@ public class LevelController : MonoBehaviour
     private void ResetLevelState()
     {
         gridBuilder?.ClearOccupiedStacks();
-    }
-
-    private float GetAnimationClipLength(string clipName)
-    {
-        if (panelAnimator == null || panelAnimator.runtimeAnimatorController == null)
-            return 1f;
-
-        foreach (AnimationClip clip in panelAnimator.runtimeAnimatorController.animationClips)
-        {
-            if (clip != null && clip.name == clipName)
-                return clip.length;
-        }
-
-        return 1f;
     }
 
     private void UpdateLevelText()

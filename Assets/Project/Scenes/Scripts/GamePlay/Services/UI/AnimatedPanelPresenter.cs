@@ -15,7 +15,7 @@ public sealed class AnimatedPanelPresenter
         this.idleTrigger = idleTrigger;
     }
 
-    public bool IsReady => panel != null && animator != null;
+    public bool IsReady => panel != null;
 
     public void Hide()
     {
@@ -29,6 +29,9 @@ public sealed class AnimatedPanelPresenter
             return;
 
         panel.SetActive(true);
+        if (animator == null)
+            return;
+
         animator.ResetTrigger(idleTrigger);
         animator.SetTrigger(showTrigger);
     }

@@ -637,10 +637,14 @@ MonoBehaviour:
   panelAnimator: {fileID: 0}
   levelText: {fileID: 4268328}
   unityLevelText: {fileID: 0}
-  nextButton: {fileID: 0}
+  nextButton: {fileID: 1105991061}
   gameOverPanel: {fileID: 411271934}
   gameOverAnimator: {fileID: 411271936}
   retryButton: {fileID: 406713231}
+  winPoupIcon:
+  - {fileID: 486087457}
+  iconAppearDelat: 1
+  iconAppearDuration: 0.5
 --- !u!4 &260257392
 Transform:
   m_ObjectHideFlags: 0

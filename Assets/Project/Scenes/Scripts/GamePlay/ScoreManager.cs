@@ -12,6 +12,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private Text unityScoreText;
     [SerializeField] private Slider scoreProgressBar;
     [SerializeField] private Transform scoreIconTarget;
+    [SerializeField] private ScoreFillFxController scoreFillFxController;
 
     [SerializeField] private float countSpeed = 100f;
 
@@ -27,6 +28,8 @@ public class ScoreManager : MonoBehaviour
 
     private readonly ScoreState scoreState = new ScoreState();
     private float displayedScore;
+    private bool hasCompletedLevel;
+    private bool loggedMissingScoreFxWarning;
 
     public int CurrentScore => scoreState.CurrentScore;
 
@@ -35,6 +38,7 @@ public class ScoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            EnsureScoreFillFxController();
         }
         else
         {
@@ -64,6 +68,7 @@ public class ScoreManager : MonoBehaviour
 
         scoreState.Reset(targetScore);
         displayedScore = 0;
+        hasCompletedLevel = false;
         UpdateUI();
     }
 
@@ -74,8 +79,11 @@ public class ScoreManager : MonoBehaviour
         UpdateScoreText();
         AnimateScoreFeedback();
 
-        if (scoreState.IsComplete)
+        if (!hasCompletedLevel && scoreState.IsComplete)
+        {
+            hasCompletedLevel = true;
             LevelController.Instance?.OnLevelCompleted();
+        }
     }
 
     public Vector3 GetScoreWorldPosition()
@@ -89,6 +97,61 @@ public class ScoreManager : MonoBehaviour
     public int? GetTargetScore()
     {
         return scoreState.TargetScore > 0 ? scoreState.TargetScore : (int?)null;
+    }
+
+    public void PlayScoreFillFxSequence(int burstCount, float interval, float startDelay = 0f)
+    {
+        EnsureScoreFillFxController();
+        if (scoreFillFxController == null)
+        {
+            if (!loggedMissingScoreFxWarning)
+            {
+                Debug.LogWarning("ScoreFillFxController is missing. Attach it to the score icon FX root or assign it in ScoreManager.");
+                loggedMissingScoreFxWarning = true;
+            }
+            return;
+        }
+
+        scoreFillFxController.PlayBurstSequence(burstCount, interval, startDelay);
+    }
+
+    private void EnsureScoreFillFxController()
+    {
+        bool attachedToScoreIcon = scoreFillFxController != null
+            && scoreIconTarget != null
+            && (scoreFillFxController.transform == scoreIconTarget || scoreFillFxController.transform.IsChildOf(scoreIconTarget));
+
+        if (scoreFillFxController != null && scoreFillFxController.gameObject.activeInHierarchy && attachedToScoreIcon)
+            return;
+
+        ScoreFillFxController inactiveTemplateController = null;
+        ScoreFillFxController[] allControllers = Resources.FindObjectsOfTypeAll<ScoreFillFxController>();
+        foreach (ScoreFillFxController controller in allControllers)
+        {
+            if (controller == null || !controller.gameObject.scene.IsValid())
+                continue;
+
+            if (controller.gameObject.activeInHierarchy)
+            {
+                scoreFillFxController = controller;
+                return;
+            }
+
+            if (inactiveTemplateController == null && controller.HasTemplates)
+                inactiveTemplateController = controller;
+        }
+
+        GameObject host = scoreIconTarget != null ? scoreIconTarget.gameObject : gameObject;
+        ScoreFillFxController runtimeController = host.GetComponent<ScoreFillFxController>();
+        if (runtimeController == null)
+            runtimeController = host.AddComponent<ScoreFillFxController>();
+
+        if (scoreFillFxController != null && runtimeController != scoreFillFxController)
+            runtimeController.SetParticleTemplates(scoreFillFxController.GetParticleTemplates());
+        else if (inactiveTemplateController != null && runtimeController != inactiveTemplateController)
+            runtimeController.SetParticleTemplates(inactiveTemplateController.GetParticleTemplates());
+
+        scoreFillFxController = runtimeController;
     }
 
     private void UpdateUI()

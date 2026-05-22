@@ -52,7 +52,10 @@ public sealed class StackSpawnSlotQuery
         for (int i = 0; i < slot.childCount; i++)
         {
             Transform child = slot.GetChild(i);
-            if (child != null && child.GetComponent<HexStack>() != null)
+            if (child == null || !child.gameObject.activeInHierarchy)
+                continue;
+
+            if (child.GetComponent<HexStack>() != null)
                 return true;
         }
 

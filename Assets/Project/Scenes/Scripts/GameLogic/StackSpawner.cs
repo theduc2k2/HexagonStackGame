@@ -85,6 +85,13 @@ public class StackSpawner : MonoBehaviour
         }
     }
 
+    public void ResetForNewLevel()
+    {
+        placedStackCount = 0;
+        ClearAllSpawnedStacks();
+        GenerateStacks();
+    }
+
     public bool IsSpawnSlot(Transform target)
     {
         CreateSlotQuery();
@@ -97,5 +104,30 @@ public class StackSpawner : MonoBehaviour
             return;
 
         slotQuery = new StackSpawnSlotQuery(stackPositionParent, slotOccupiedRadius);
+    }
+
+    private void ClearAllSpawnedStacks()
+    {
+        if (stackPositionParent == null)
+            return;
+
+        for (int i = 0; i < stackPositionParent.childCount; i++)
+        {
+            Transform slot = stackPositionParent.GetChild(i);
+            for (int j = slot.childCount - 1; j >= 0; j--)
+            {
+                Transform child = slot.GetChild(j);
+                if (child == null || child.GetComponent<HexStack>() == null)
+                    continue;
+
+                if (Application.isPlaying)
+                {
+                    child.gameObject.SetActive(false);
+                    Destroy(child.gameObject);
+                }
+                else
+                    DestroyImmediate(child.gameObject);
+            }
+        }
     }
 }

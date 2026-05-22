@@ -32,6 +32,7 @@ public class LevelController : MonoBehaviour
     private ILevelDataProvider levelDataProvider;
     private LevelGridBuilder gridBuilder;
     private LevelAccessUseCase levelAccessUseCase;
+    private StackSpawner stackSpawner;
 
     private void Awake()
     {
@@ -70,6 +71,7 @@ public class LevelController : MonoBehaviour
 
         EnsureGridParent();
         CreateGridBuilder();
+        CacheStackSpawner();
         ActivateLevel(currentLevel);
         ScoreManager.Instance?.InitLevel();
 
@@ -122,6 +124,7 @@ public class LevelController : MonoBehaviour
 
         gridBuilder.Build(data);
         ResetLevelState();
+        ResetStackSpawnerForLevel();
 
         currentLevel = levelIndex;
 
@@ -281,6 +284,26 @@ public class LevelController : MonoBehaviour
         GridCellPool gridCellPool = new GridCellPool(gridCellPrefab);
         MapAutoScaler mapAutoScaler = new MapAutoScaler(maxMapWidth, maxMapHeight);
         gridBuilder = new LevelGridBuilder(gridCellPool, gridParent, mapAutoScaler);
+    }
+
+    private void CacheStackSpawner()
+    {
+        if (stackSpawner != null)
+            return;
+
+        stackSpawner = FindFirstObjectByType<StackSpawner>();
+    }
+
+    private void ResetStackSpawnerForLevel()
+    {
+        CacheStackSpawner();
+        if (stackSpawner == null)
+        {
+            Debug.LogWarning("StackSpawner was not found while resetting level state.");
+            return;
+        }
+
+        stackSpawner.ResetForNewLevel();
     }
 
     private bool HasLevels => levelDatas != null && levelDatas.Length > 0;

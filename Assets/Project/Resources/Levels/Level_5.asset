@@ -17,49 +17,31 @@ MonoBehaviour:
   cells:
   - localPosition: {x: -4.33, y: 0, z: -1.5}
     isUnlocked: 1
-  - localPosition: {x: -4.33, y: 0, z: 1.5}
-    isUnlocked: 1
-  - localPosition: {x: -3.464, y: 0, z: -3}
-    isUnlocked: 1
   - localPosition: {x: -2.598, y: 0, z: -1.5}
     isUnlocked: 1
   - localPosition: {x: -3.464, y: 0, z: 0}
     isUnlocked: 1
   - localPosition: {x: -2.598, y: 0, z: 1.5}
     isUnlocked: 1
-  - localPosition: {x: -3.464, y: 0, z: 3}
+  - localPosition: {x: -1.732, y: 0, z: -3}
     isUnlocked: 1
-  - localPosition: {x: -0.86599994, y: 0, z: -4.5}
+  - localPosition: {x: -1.732, y: 0, z: 0}
     isUnlocked: 1
-  - localPosition: {x: -1.7319999, y: 0, z: -3}
+  - localPosition: {x: -0.866, y: 0, z: 1.5}
     isUnlocked: 1
-  - localPosition: {x: -1.7319999, y: 0, z: 3}
+  - localPosition: {x: 0, y: 0, z: 0}
     isUnlocked: 1
-  - localPosition: {x: -0.86599994, y: 0, z: 4.5}
-    isUnlocked: 1
-  - localPosition: {x: 0.866, y: 0, z: -4.5}
-    isUnlocked: 1
-  - localPosition: {x: 0, y: 0, z: -3}
-    isUnlocked: 1
-  - localPosition: {x: 0, y: 0, z: 3}
-    isUnlocked: 1
-  - localPosition: {x: 0.866, y: 0, z: 4.5}
+  - localPosition: {x: 0.866, y: 0, z: 1.5}
     isUnlocked: 1
   - localPosition: {x: 1.732, y: 0, z: -3}
     isUnlocked: 1
   - localPosition: {x: 2.598, y: 0, z: -1.5}
     isUnlocked: 1
+  - localPosition: {x: 1.732, y: 0, z: 0}
+    isUnlocked: 1
   - localPosition: {x: 2.598, y: 0, z: 1.5}
-    isUnlocked: 1
-  - localPosition: {x: 1.732, y: 0, z: 3}
-    isUnlocked: 1
-  - localPosition: {x: 3.464, y: 0, z: -3}
     isUnlocked: 1
   - localPosition: {x: 4.33, y: 0, z: -1.5}
     isUnlocked: 1
   - localPosition: {x: 3.464, y: 0, z: 0}
-    isUnlocked: 1
-  - localPosition: {x: 4.33, y: 0, z: 1.5}
-    isUnlocked: 1
-  - localPosition: {x: 3.464, y: 0, z: 3}
     isUnlocked: 1
